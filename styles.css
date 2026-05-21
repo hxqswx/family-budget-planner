@@ -306,19 +306,15 @@ label,
   align-items: start;
 }
 
-.input-panel {
+.panel[data-size="small"] {
   grid-column: span 3;
 }
 
-.budget-panel {
-  grid-column: span 5;
+.panel[data-size="medium"] {
+  grid-column: span 6;
 }
 
-.timeline-panel {
-  grid-column: span 4;
-}
-
-.yearly-panel {
+.panel[data-size="large"] {
   grid-column: span 12;
 }
 
@@ -356,6 +352,29 @@ label,
   color: var(--muted);
   cursor: grab;
   touch-action: none;
+}
+
+.size-toggle {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  min-height: 34px;
+  border: 2px solid rgba(47, 53, 66, 0.12);
+  border-radius: 12px;
+  padding: 0;
+  background: #fff0b8;
+  box-shadow: none;
+  color: #996b00;
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.size-toggle:hover,
+.drag-handle:hover {
+  transform: translateY(1px);
+  box-shadow: none;
 }
 
 .drag-handle:active {
@@ -905,7 +924,8 @@ input[type="color"] {
   .input-panel,
   .budget-panel,
   .timeline-panel,
-  .yearly-panel {
+  .yearly-panel,
+  .panel[data-size] {
     grid-column: 1;
   }
 

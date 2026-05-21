@@ -1,19 +1,25 @@
 const defaultCategories = [
-  { id: "food", name: "餐饮", budget: 3200, icon: "饭", color: "#84d7b5" },
-  { id: "home", name: "房租家居", budget: 7800, icon: "家", color: "#84c5f4" },
   { id: "baby", name: "孩子教育", budget: 2400, icon: "学", color: "#ffd166" },
-  { id: "fun", name: "娱乐玩具", budget: 1200, icon: "乐", color: "#ff8fa3" },
-  { id: "health", name: "医疗健康", budget: 1600, icon: "康", color: "#b69cff" },
-  { id: "travel", name: "交通旅行", budget: 1800, icon: "行", color: "#f2a65a" },
+  { id: "market", name: "超市", budget: 3200, icon: "超", color: "#84d7b5" },
+  { id: "shopping", name: "购物", budget: 1800, icon: "购", color: "#ff8fa3" },
+  { id: "travel", name: "旅游", budget: 2200, icon: "游", color: "#84c5f4" },
+  { id: "food", name: "餐饮", budget: 2600, icon: "饭", color: "#b69cff" },
 ];
 
+const legacyDefaultCategoryIds = ["food", "home", "baby", "fun", "health", "travel"];
+const legacyCategoryRemap = {
+  home: "shopping",
+  fun: "shopping",
+  health: "shopping",
+};
+
 const starterExpenses = [
-  { name: "周末超市", amount: 356.8, category: "food", date: "2026-05-18" },
-  { name: "亲子乐园", amount: 220, category: "fun", date: "2026-05-17" },
+  { name: "周末超市", amount: 356.8, category: "market", date: "2026-05-18" },
+  { name: "亲子乐园", amount: 220, category: "baby", date: "2026-05-17" },
   { name: "地铁通勤", amount: 86, category: "travel", date: "2026-05-16" },
   { name: "绘本和文具", amount: 188.5, category: "baby", date: "2026-05-15" },
-  { name: "家庭药箱补货", amount: 142, category: "health", date: "2026-05-13" },
-  { name: "年初保险", amount: 1280, category: "health", date: "2026-01-09" },
+  { name: "家庭日用品", amount: 142, category: "shopping", date: "2026-05-13" },
+  { name: "年初换季采购", amount: 1280, category: "shopping", date: "2026-01-09" },
   { name: "春假短途旅行", amount: 1650, category: "travel", date: "2026-04-04" },
   { name: "新年聚餐", amount: 620, category: "food", date: "2026-02-14" },
 ];
@@ -39,7 +45,15 @@ const preciseCurrency = new Intl.NumberFormat("zh-CN", {
 const monthNames = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
 const storageKey = "family-budget-planner-state";
 const panelLayoutKey = "family-budget-planner-panel-layout";
+const panelSizeKey = "family-budget-planner-panel-sizes";
 const defaultPanelOrder = ["input", "budget", "timeline", "yearly"];
+const defaultPanelSizes = {
+  input: "small",
+  budget: "medium",
+  timeline: "small",
+  yearly: "large",
+};
+const panelSizeCycle = ["small", "medium", "large"];
 
 const elements = {
   panelBoard: document.querySelector("#panelBoard"),
@@ -87,6 +101,7 @@ const elements = {
 let state = loadState();
 let deferredInstallPrompt = null;
 let panelOrder = loadPanelOrder();
+let panelSizes = loadPanelSizes();
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -101,14 +116,40 @@ function loadState() {
 
   try {
     const parsed = JSON.parse(saved);
+    const migrated = migrateLegacyDefaults(parsed);
+
     return {
-      income: Number(parsed.income ?? starterState.income),
-      categories: normalizeCategories(parsed.categories),
-      expenses: normalizeExpenses(parsed.expenses),
+      income: Number(migrated.income ?? starterState.income),
+      categories: normalizeCategories(migrated.categories),
+      expenses: normalizeExpenses(migrated.expenses),
     };
   } catch {
     return clone(starterState);
   }
+}
+
+function migrateLegacyDefaults(savedState) {
+  const categoryIds = Array.isArray(savedState.categories) ? savedState.categories.map((category) => category.id) : [];
+  const isLegacyDefault =
+    categoryIds.length === legacyDefaultCategoryIds.length &&
+    legacyDefaultCategoryIds.every((categoryId) => categoryIds.includes(categoryId)) &&
+    !categoryIds.includes("market") &&
+    !categoryIds.includes("shopping");
+
+  if (!isLegacyDefault) {
+    return savedState;
+  }
+
+  return {
+    ...savedState,
+    categories: clone(defaultCategories),
+    expenses: Array.isArray(savedState.expenses)
+      ? savedState.expenses.map((expense) => ({
+          ...expense,
+          category: legacyCategoryRemap[expense.category] || expense.category,
+        }))
+      : savedState.expenses,
+  };
 }
 
 function normalizeCategories(categories) {
@@ -160,13 +201,55 @@ function savePanelOrder() {
   localStorage.setItem(panelLayoutKey, JSON.stringify(panelOrder));
 }
 
+function loadPanelSizes() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(panelSizeKey) || "{}");
+    return Object.fromEntries(
+      defaultPanelOrder.map((panelId) => [
+        panelId,
+        panelSizeCycle.includes(saved[panelId]) ? saved[panelId] : defaultPanelSizes[panelId],
+      ]),
+    );
+  } catch {
+    return { ...defaultPanelSizes };
+  }
+}
+
+function savePanelSizes() {
+  localStorage.setItem(panelSizeKey, JSON.stringify(panelSizes));
+}
+
 function renderPanelLayout() {
   panelOrder.forEach((panelId) => {
     const panel = elements.panelBoard.querySelector(`[data-panel="${panelId}"]`);
     if (panel) {
+      panel.dataset.size = panelSizes[panelId] || defaultPanelSizes[panelId];
       elements.panelBoard.append(panel);
     }
   });
+}
+
+function cyclePanelSize(panel) {
+  const panelId = panel.dataset.panel;
+  const currentSize = panelSizes[panelId] || defaultPanelSizes[panelId];
+  const nextSize = panelSizeCycle[(panelSizeCycle.indexOf(currentSize) + 1) % panelSizeCycle.length];
+
+  panelSizes = { ...panelSizes, [panelId]: nextSize };
+  panel.dataset.size = nextSize;
+  savePanelSizes();
+  updateSizeButton(panel);
+}
+
+function updateSizeButton(panel) {
+  const button = panel.querySelector(".size-toggle");
+  if (!button) {
+    return;
+  }
+
+  const size = panel.dataset.size || "medium";
+  const label = size === "small" ? "小" : size === "medium" ? "中" : "大";
+  button.textContent = label;
+  button.setAttribute("aria-label", `调整${panel.querySelector("h2")?.textContent || "板块"}大小，当前${label}`);
 }
 
 function movePanel(draggedId, targetId, placeAfter = false) {
@@ -205,11 +288,19 @@ function setupDraggablePanels() {
     }
 
     const handle = document.createElement("button");
+    const sizeButton = document.createElement("button");
+
     handle.className = "drag-handle";
     handle.type = "button";
     handle.draggable = true;
     handle.setAttribute("aria-label", `拖拽移动${title.querySelector("h2")?.textContent || "板块"}`);
     title.prepend(handle);
+
+    sizeButton.className = "size-toggle";
+    sizeButton.type = "button";
+    sizeButton.addEventListener("click", () => cyclePanelSize(panel));
+    handle.insertAdjacentElement("afterend", sizeButton);
+    updateSizeButton(panel);
 
     handle.addEventListener("dragstart", (event) => {
       draggedPanel = panel;
