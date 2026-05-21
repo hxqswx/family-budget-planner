@@ -166,6 +166,20 @@
       </section>
     </main>
 
+    <dialog id="resetDialog" class="cute-dialog" aria-labelledby="resetDialogTitle">
+      <div class="dialog-mascot" aria-hidden="true">
+        <span class="dialog-ear left"></span>
+        <span class="dialog-ear right"></span>
+        <span class="dialog-face">¥</span>
+      </div>
+      <h2 id="resetDialogTitle">真的要清空记录吗？</h2>
+      <p>所有支出记录会被删除，本月收入会归零；你的分类设置会保留。</p>
+      <div class="dialog-actions">
+        <button id="confirmReset" class="danger-button" type="button">清空记录</button>
+        <button id="cancelReset" class="soft-button" type="button">再想想</button>
+      </div>
+    </dialog>
+
     <template id="categoryTemplate">
       <article class="category-row">
         <div class="category-topline">

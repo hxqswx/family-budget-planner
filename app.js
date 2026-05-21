@@ -54,6 +54,9 @@ const elements = {
   expenseList: document.querySelector("#expenseList"),
   expenseCount: document.querySelector("#expenseCount"),
   reset: document.querySelector("#resetData"),
+  resetDialog: document.querySelector("#resetDialog"),
+  confirmReset: document.querySelector("#confirmReset"),
+  cancelReset: document.querySelector("#cancelReset"),
   categoryForm: document.querySelector("#categoryForm"),
   categorySelect: document.querySelector("#categorySelect"),
   categoryName: document.querySelector("#categoryName"),
@@ -430,22 +433,35 @@ function deleteCategory() {
 }
 
 function resetRecords() {
-  const confirmed = window.confirm("确定要清空所有支出记录，并把本月收入重置为 0 吗？分类设置会保留。");
-
-  if (!confirmed) {
+  if (typeof elements.resetDialog.showModal === "function") {
+    elements.resetDialog.showModal();
     return;
   }
 
+  clearRecords();
+}
+
+function clearRecords() {
   state.expenses = [];
   state.income = 0;
   saveState();
   render();
+  if (elements.resetDialog.open) {
+    elements.resetDialog.close();
+  }
 }
 
 elements.date.valueAsDate = new Date();
 elements.form.addEventListener("submit", addExpense);
 elements.income.addEventListener("input", updateIncome);
 elements.reset.addEventListener("click", resetRecords);
+elements.confirmReset.addEventListener("click", clearRecords);
+elements.cancelReset.addEventListener("click", () => elements.resetDialog.close());
+elements.resetDialog.addEventListener("click", (event) => {
+  if (event.target === elements.resetDialog) {
+    elements.resetDialog.close();
+  }
+});
 elements.categorySelect.addEventListener("change", syncCategoryEditor);
 elements.categoryForm.addEventListener("submit", saveCategory);
 elements.newCategory.addEventListener("click", addCategory);
