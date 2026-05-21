@@ -66,8 +66,8 @@
         </article>
       </section>
 
-      <section class="workspace">
-        <aside class="panel input-panel">
+      <section id="panelBoard" class="panel-board" aria-label="可拖拽板块">
+        <aside class="panel input-panel" data-panel="input">
           <div class="panel-title">
             <h2>记录一笔</h2>
             <span class="pill">Local</span>
@@ -100,7 +100,7 @@
           </div>
         </aside>
 
-        <section class="panel budget-panel">
+        <section class="panel budget-panel" data-panel="budget">
           <div class="panel-title">
             <h2>分类预算</h2>
             <button id="resetData" class="ghost-button danger" type="button">重置记录</button>
@@ -108,17 +108,14 @@
           <div id="categoryList" class="category-list"></div>
         </section>
 
-        <section class="panel timeline-panel">
+        <section class="panel timeline-panel" data-panel="timeline">
           <div class="panel-title">
             <h2>最近支出</h2>
             <span id="expenseCount" class="pill">0 笔</span>
           </div>
           <div id="expenseList" class="expense-list"></div>
         </section>
-      </section>
-
-      <section class="lower-grid">
-        <section class="panel category-editor-panel">
+        <section class="panel category-editor-panel" data-panel="category">
           <div class="panel-title">
             <h2>修改分类</h2>
             <button id="newCategory" class="icon-text-button" type="button">+ 新增</button>
@@ -153,7 +150,7 @@
           </form>
         </section>
 
-        <section class="panel yearly-panel">
+        <section class="panel yearly-panel" data-panel="yearly">
           <div class="panel-title">
             <h2>年度总结</h2>
             <label class="compact-label">

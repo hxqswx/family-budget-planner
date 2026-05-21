@@ -38,8 +38,11 @@ const preciseCurrency = new Intl.NumberFormat("zh-CN", {
 
 const monthNames = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
 const storageKey = "family-budget-planner-state";
+const panelLayoutKey = "family-budget-planner-panel-layout";
+const defaultPanelOrder = ["input", "budget", "timeline", "category", "yearly"];
 
 const elements = {
+  panelBoard: document.querySelector("#panelBoard"),
   form: document.querySelector("#expenseForm"),
   installApp: document.querySelector("#installApp"),
   offlineBadge: document.querySelector("#offlineBadge"),
@@ -80,6 +83,7 @@ const elements = {
 
 let state = loadState();
 let deferredInstallPrompt = null;
+let panelOrder = loadPanelOrder();
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -137,6 +141,164 @@ function normalizeExpenses(expenses) {
 
 function saveState() {
   localStorage.setItem(storageKey, JSON.stringify(state));
+}
+
+function loadPanelOrder() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(panelLayoutKey) || "[]");
+    const validPanels = saved.filter((panelId) => defaultPanelOrder.includes(panelId));
+    return [...validPanels, ...defaultPanelOrder.filter((panelId) => !validPanels.includes(panelId))];
+  } catch {
+    return [...defaultPanelOrder];
+  }
+}
+
+function savePanelOrder() {
+  localStorage.setItem(panelLayoutKey, JSON.stringify(panelOrder));
+}
+
+function renderPanelLayout() {
+  panelOrder.forEach((panelId) => {
+    const panel = elements.panelBoard.querySelector(`[data-panel="${panelId}"]`);
+    if (panel) {
+      elements.panelBoard.append(panel);
+    }
+  });
+}
+
+function movePanel(draggedId, targetId, placeAfter = false) {
+  if (!draggedId || !targetId || draggedId === targetId) {
+    return;
+  }
+
+  const nextOrder = panelOrder.filter((panelId) => panelId !== draggedId);
+  const targetIndex = nextOrder.indexOf(targetId);
+  const insertIndex = targetIndex < 0 ? nextOrder.length : targetIndex + (placeAfter ? 1 : 0);
+  nextOrder.splice(insertIndex, 0, draggedId);
+  panelOrder = nextOrder;
+  savePanelOrder();
+  renderPanelLayout();
+}
+
+function clearDragState() {
+  elements.panelBoard.querySelectorAll(".panel").forEach((panel) => {
+    panel.classList.remove("is-dragging", "drag-target");
+  });
+}
+
+function getPanelFromPoint(x, y) {
+  return document.elementFromPoint(x, y)?.closest?.("[data-panel]");
+}
+
+function setupDraggablePanels() {
+  const panels = [...elements.panelBoard.querySelectorAll("[data-panel]")];
+  let draggedPanel = null;
+  let pointerDrag = null;
+
+  panels.forEach((panel) => {
+    const title = panel.querySelector(".panel-title");
+    if (!title || title.querySelector(".drag-handle")) {
+      return;
+    }
+
+    const handle = document.createElement("button");
+    handle.className = "drag-handle";
+    handle.type = "button";
+    handle.draggable = true;
+    handle.setAttribute("aria-label", `拖拽移动${title.querySelector("h2")?.textContent || "板块"}`);
+    title.prepend(handle);
+
+    handle.addEventListener("dragstart", (event) => {
+      draggedPanel = panel;
+      panel.classList.add("is-dragging");
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", panel.dataset.panel);
+    });
+
+    handle.addEventListener("dragend", () => {
+      draggedPanel = null;
+      clearDragState();
+    });
+
+    handle.addEventListener("pointerdown", (event) => {
+      if (event.pointerType === "mouse") {
+        return;
+      }
+
+      pointerDrag = {
+        panel,
+        startX: event.clientX,
+        startY: event.clientY,
+        target: null,
+        placeAfter: false,
+        active: false,
+      };
+      handle.setPointerCapture(event.pointerId);
+    });
+
+    handle.addEventListener("pointermove", (event) => {
+      if (!pointerDrag) {
+        return;
+      }
+
+      const distance = Math.hypot(event.clientX - pointerDrag.startX, event.clientY - pointerDrag.startY);
+      if (distance < 8 && !pointerDrag.active) {
+        return;
+      }
+
+      event.preventDefault();
+      pointerDrag.active = true;
+      pointerDrag.panel.classList.add("is-dragging");
+      elements.panelBoard.querySelectorAll(".drag-target").forEach((target) => target.classList.remove("drag-target"));
+
+      const target = getPanelFromPoint(event.clientX, event.clientY);
+      if (target && target !== pointerDrag.panel) {
+        const targetRect = target.getBoundingClientRect();
+        target.classList.add("drag-target");
+        pointerDrag.target = target;
+        pointerDrag.placeAfter = event.clientY > targetRect.top + targetRect.height / 2;
+      }
+    });
+
+    handle.addEventListener("pointerup", (event) => {
+      if (!pointerDrag) {
+        return;
+      }
+
+      if (pointerDrag.active && pointerDrag.target) {
+        movePanel(pointerDrag.panel.dataset.panel, pointerDrag.target.dataset.panel, pointerDrag.placeAfter);
+      }
+
+      handle.releasePointerCapture(event.pointerId);
+      pointerDrag = null;
+      clearDragState();
+    });
+  });
+
+  elements.panelBoard.addEventListener("dragover", (event) => {
+    if (!draggedPanel) {
+      return;
+    }
+
+    event.preventDefault();
+    const target = event.target.closest("[data-panel]");
+    elements.panelBoard.querySelectorAll(".drag-target").forEach((panel) => panel.classList.remove("drag-target"));
+    if (target && target !== draggedPanel) {
+      target.classList.add("drag-target");
+      event.dataTransfer.dropEffect = "move";
+    }
+  });
+
+  elements.panelBoard.addEventListener("drop", (event) => {
+    event.preventDefault();
+    const target = event.target.closest("[data-panel]");
+    if (draggedPanel && target) {
+      const targetRect = target.getBoundingClientRect();
+      movePanel(draggedPanel.dataset.panel, target.dataset.panel, event.clientY > targetRect.top + targetRect.height / 2);
+    }
+    draggedPanel = null;
+    clearDragState();
+  });
 }
 
 function getCategoryById(categoryId) {
@@ -534,6 +696,8 @@ elements.categoryForm.addEventListener("submit", saveCategory);
 elements.newCategory.addEventListener("click", addCategory);
 elements.deleteCategory.addEventListener("click", deleteCategory);
 elements.yearSelect.addEventListener("change", renderYearlySummary);
+renderPanelLayout();
+setupDraggablePanels();
 registerServiceWorker();
 setupInstallPrompt();
 render();
