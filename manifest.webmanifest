@@ -1,7 +1,7 @@
 {
-  "name": "家庭支出 Monitor & Planner",
-  "short_name": "家庭账本",
-  "description": "可爱的家庭支出 monitor and planner，支持分类预算、年度总结和离线使用。",
+  "name": "家庭支出小管理",
+  "short_name": "支出小管理",
+  "description": "可爱的家庭支出小管理，支持分类预算、年度总结和离线使用。",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
