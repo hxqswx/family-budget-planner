@@ -121,7 +121,7 @@
         <section class="panel category-editor-panel">
           <div class="panel-title">
             <h2>修改分类</h2>
-            <button id="newCategory" class="ghost-button" type="button">新增分类</button>
+            <button id="newCategory" class="icon-text-button" type="button">+ 新增</button>
           </div>
           <form id="categoryForm" class="category-form">
             <label>
@@ -148,7 +148,7 @@
             </div>
             <div class="button-row">
               <button type="submit">保存分类</button>
-              <button id="deleteCategory" class="ghost-button danger" type="button">删除分类</button>
+              <button id="deleteCategory" class="ghost-button danger" type="button">删除</button>
             </div>
           </form>
         </section>
@@ -175,6 +175,7 @@
               <strong id="topMonth">-</strong>
             </article>
           </div>
+          <div id="yearCategoryChips" class="year-category-chips"></div>
           <div id="monthBreakdown" class="month-grid"></div>
         </section>
       </section>
@@ -222,7 +223,7 @@
     </template>
 
     <template id="monthTemplate">
-      <article class="month-card">
+      <article class="month-row">
         <div class="month-head">
           <h3></h3>
           <strong></strong>

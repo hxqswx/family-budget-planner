@@ -71,6 +71,7 @@ const elements = {
   yearTotal: document.querySelector("#yearTotal"),
   monthAverage: document.querySelector("#monthAverage"),
   topMonth: document.querySelector("#topMonth"),
+  yearCategoryChips: document.querySelector("#yearCategoryChips"),
   monthBreakdown: document.querySelector("#monthBreakdown"),
   categoryTemplate: document.querySelector("#categoryTemplate"),
   expenseTemplate: document.querySelector("#expenseTemplate"),
@@ -267,6 +268,7 @@ function renderYearlySummary() {
     total: 0,
     categories: new Map(),
   }));
+  const yearlyCategories = new Map();
 
   state.expenses.forEach((expense) => {
     const date = new Date(`${expense.date}T00:00:00`);
@@ -280,6 +282,7 @@ function renderYearlySummary() {
       expense.category,
       (monthly[monthIndex].categories.get(expense.category) || 0) + expense.amount,
     );
+    yearlyCategories.set(expense.category, (yearlyCategories.get(expense.category) || 0) + expense.amount);
   });
 
   const yearTotal = monthly.reduce((sum, month) => sum + month.total, 0);
@@ -289,7 +292,26 @@ function renderYearlySummary() {
   elements.yearTotal.textContent = currency.format(yearTotal);
   elements.monthAverage.textContent = currency.format(yearTotal / activeMonths);
   elements.topMonth.textContent = yearTotal > 0 ? `${monthNames[topMonthIndex]} ${currency.format(monthly[topMonthIndex].total)}` : "-";
+  elements.yearCategoryChips.innerHTML = "";
   elements.monthBreakdown.innerHTML = "";
+
+  if (yearTotal === 0) {
+    const empty = document.createElement("p");
+    empty.className = "mini-empty compact";
+    empty.textContent = "这一年还没有支出记录。";
+    elements.yearCategoryChips.append(empty);
+  } else {
+    [...yearlyCategories.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .forEach(([categoryId, amount]) => {
+        const category = getCategoryById(categoryId) || getFallbackCategory();
+        const chip = document.createElement("span");
+        chip.style.setProperty("--chip-color", category.color);
+        chip.textContent = `${category.icon} ${category.name} ${currency.format(amount)}`;
+        elements.yearCategoryChips.append(chip);
+      });
+  }
 
   monthly.forEach((month, index) => {
     const node = elements.monthTemplate.content.firstElementChild.cloneNode(true);
@@ -305,6 +327,7 @@ function renderYearlySummary() {
     } else {
       [...month.categories.entries()]
         .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
         .forEach(([categoryId, amount]) => {
           const category = getCategoryById(categoryId) || getFallbackCategory();
           const item = document.createElement("div");
