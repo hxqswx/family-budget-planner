@@ -46,6 +46,7 @@ const monthNames = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8�
 const storageKey = "family-budget-planner-state";
 const panelLayoutKey = "family-budget-planner-panel-layout";
 const panelSizeKey = "family-budget-planner-panel-sizes";
+const installStateKey = "family-budget-planner-installed";
 const defaultPanelOrder = ["input", "budget", "timeline", "yearly"];
 const defaultPanelSizes = {
   input: "small",
@@ -769,18 +770,16 @@ function registerServiceWorker() {
 }
 
 function setupInstallPrompt() {
-  const isStandalone =
-    window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
   const userAgent = window.navigator.userAgent;
   const isIOS = /iphone|ipad|ipod/i.test(userAgent);
   const isAndroid = /android/i.test(userAgent);
 
-  elements.installApp.hidden = isStandalone;
+  updateInstallButtonVisibility();
 
   window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
     deferredInstallPrompt = event;
-    elements.installApp.hidden = false;
+    updateInstallButtonVisibility();
   });
 
   elements.installApp.addEventListener("click", async () => {
@@ -795,9 +794,12 @@ function setupInstallPrompt() {
     }
 
     deferredInstallPrompt.prompt();
-    await deferredInstallPrompt.userChoice;
+    const choice = await deferredInstallPrompt.userChoice;
     deferredInstallPrompt = null;
-    elements.installApp.hidden = true;
+    if (choice.outcome === "accepted") {
+      markAppInstalled();
+    }
+    updateInstallButtonVisibility();
   });
 
   elements.closeInstallDialog.addEventListener("click", () => elements.installDialog.close());
@@ -810,8 +812,21 @@ function setupInstallPrompt() {
 
   window.addEventListener("appinstalled", () => {
     deferredInstallPrompt = null;
-    elements.installApp.hidden = true;
+    markAppInstalled();
+    updateInstallButtonVisibility();
   });
+}
+
+function isRunningInstalled() {
+  return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+}
+
+function markAppInstalled() {
+  localStorage.setItem(installStateKey, "true");
+}
+
+function updateInstallButtonVisibility() {
+  elements.installApp.hidden = isRunningInstalled() || localStorage.getItem(installStateKey) === "true";
 }
 
 function showInstallHelp(platform) {
