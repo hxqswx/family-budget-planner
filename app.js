@@ -770,10 +770,6 @@ function registerServiceWorker() {
 }
 
 function setupInstallPrompt() {
-  const userAgent = window.navigator.userAgent;
-  const isIOS = /iphone|ipad|ipod/i.test(userAgent);
-  const isAndroid = /android/i.test(userAgent);
-
   updateInstallButtonVisibility();
 
   window.addEventListener("beforeinstallprompt", (event) => {
@@ -783,13 +779,20 @@ function setupInstallPrompt() {
   });
 
   elements.installApp.addEventListener("click", async () => {
-    if (isIOS) {
+    const platform = getInstallPlatform();
+
+    if (!platform) {
+      updateInstallButtonVisibility();
+      return;
+    }
+
+    if (platform === "ios") {
       showInstallHelp("ios");
       return;
     }
 
     if (!deferredInstallPrompt) {
-      showInstallHelp(isAndroid ? "android" : "desktop");
+      showInstallHelp("android");
       return;
     }
 
@@ -821,12 +824,24 @@ function isRunningInstalled() {
   return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
 }
 
+function getInstallPlatform() {
+  const userAgent = window.navigator.userAgent;
+  if (/iphone|ipad|ipod/i.test(userAgent)) {
+    return "ios";
+  }
+  if (/android/i.test(userAgent)) {
+    return "android";
+  }
+  return null;
+}
+
 function markAppInstalled() {
   localStorage.setItem(installStateKey, "true");
 }
 
 function updateInstallButtonVisibility() {
-  elements.installApp.hidden = isRunningInstalled() || localStorage.getItem(installStateKey) === "true";
+  elements.installApp.hidden =
+    !getInstallPlatform() || isRunningInstalled() || localStorage.getItem(installStateKey) === "true";
 }
 
 function showInstallHelp(platform) {
@@ -838,10 +853,6 @@ function showInstallHelp(platform) {
     android: {
       title: "安装到安卓手机",
       steps: ["用 Chrome 打开这个页面。", "点右上角菜单按钮。", "选择“安装应用”或“添加到主屏幕”。"],
-    },
-    desktop: {
-      title: "安装到设备",
-      steps: ["用 Chrome 或 Edge 打开这个页面。", "点地址栏右侧的安装图标。", "选择“安装”。"],
     },
   }[platform];
 
