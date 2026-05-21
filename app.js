@@ -59,6 +59,9 @@ const elements = {
   panelBoard: document.querySelector("#panelBoard"),
   form: document.querySelector("#expenseForm"),
   installApp: document.querySelector("#installApp"),
+  installDialog: document.querySelector("#installDialog"),
+  closeInstallDialog: document.querySelector("#closeInstallDialog"),
+  confirmInstallTip: document.querySelector("#confirmInstallTip"),
   offlineBadge: document.querySelector("#offlineBadge"),
   name: document.querySelector("#expenseName"),
   amount: document.querySelector("#expenseAmount"),
@@ -764,6 +767,12 @@ function registerServiceWorker() {
 }
 
 function setupInstallPrompt() {
+  const isStandalone =
+    window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+
+  elements.installApp.hidden = isStandalone;
+
   window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
     deferredInstallPrompt = event;
@@ -771,7 +780,13 @@ function setupInstallPrompt() {
   });
 
   elements.installApp.addEventListener("click", async () => {
+    if (isIOS) {
+      elements.installDialog.showModal();
+      return;
+    }
+
     if (!deferredInstallPrompt) {
+      elements.installDialog.showModal();
       return;
     }
 
@@ -779,6 +794,14 @@ function setupInstallPrompt() {
     await deferredInstallPrompt.userChoice;
     deferredInstallPrompt = null;
     elements.installApp.hidden = true;
+  });
+
+  elements.closeInstallDialog.addEventListener("click", () => elements.installDialog.close());
+  elements.confirmInstallTip.addEventListener("click", () => elements.installDialog.close());
+  elements.installDialog.addEventListener("click", (event) => {
+    if (event.target === elements.installDialog) {
+      elements.installDialog.close();
+    }
   });
 
   window.addEventListener("appinstalled", () => {

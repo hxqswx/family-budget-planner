@@ -24,7 +24,7 @@
           <h1>家庭支出小管理</h1>
           <p class="subtitle">把每一笔支出放进可爱的收纳盒里，年底也能看清每个月的变化。</p>
           <div class="hero-actions">
-            <button id="installApp" class="install-button" type="button" hidden>安装到手机</button>
+            <button id="installApp" class="install-button" type="button">安装到手机</button>
             <span id="offlineBadge" class="status-chip" hidden>离线可用</span>
           </div>
         </div>
@@ -158,6 +158,19 @@
         <button id="confirmReset" class="danger-button" type="button">清空记录</button>
         <button id="cancelReset" class="soft-button" type="button">再想想</button>
       </div>
+    </dialog>
+
+    <dialog id="installDialog" class="cute-dialog install-dialog" aria-labelledby="installDialogTitle">
+      <div class="dialog-header">
+        <h2 id="installDialogTitle">安装到 iPhone</h2>
+        <button id="closeInstallDialog" class="close-button" type="button" aria-label="关闭">×</button>
+      </div>
+      <ol class="install-steps">
+        <li>用 Safari 打开这个页面。</li>
+        <li>点底部分享按钮。</li>
+        <li>选择“添加到主屏幕”。</li>
+      </ol>
+      <button id="confirmInstallTip" class="soft-button" type="button">知道啦</button>
     </dialog>
 
     <dialog id="categoryDialog" class="cute-dialog category-dialog" aria-labelledby="categoryDialogTitle">

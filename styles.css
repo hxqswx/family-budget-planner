@@ -841,6 +841,12 @@ input[type="color"] {
   text-align: left;
 }
 
+.install-dialog {
+  width: min(390px, calc(100vw - 28px));
+  padding: 20px;
+  text-align: left;
+}
+
 .dialog-header {
   display: flex;
   align-items: center;
@@ -868,6 +874,20 @@ input[type="color"] {
   box-shadow: none;
   font-size: 1.35rem;
   line-height: 1;
+}
+
+.install-steps {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 18px;
+  padding-left: 22px;
+  color: var(--ink);
+  line-height: 1.55;
+}
+
+.install-steps li::marker {
+  color: #d95c73;
+  font-weight: 900;
 }
 
 .cute-dialog p {
