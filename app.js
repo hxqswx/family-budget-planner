@@ -41,6 +41,8 @@ const storageKey = "family-budget-planner-state";
 
 const elements = {
   form: document.querySelector("#expenseForm"),
+  installApp: document.querySelector("#installApp"),
+  offlineBadge: document.querySelector("#offlineBadge"),
   name: document.querySelector("#expenseName"),
   amount: document.querySelector("#expenseAmount"),
   category: document.querySelector("#expenseCategory"),
@@ -76,6 +78,7 @@ const elements = {
 };
 
 let state = loadState();
+let deferredInstallPrompt = null;
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -451,6 +454,47 @@ function clearRecords() {
   }
 }
 
+function registerServiceWorker() {
+  if (!("serviceWorker" in navigator)) {
+    return;
+  }
+
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("/service-worker.js")
+      .then(() => {
+        elements.offlineBadge.hidden = false;
+      })
+      .catch(() => {
+        elements.offlineBadge.hidden = true;
+      });
+  });
+}
+
+function setupInstallPrompt() {
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    elements.installApp.hidden = false;
+  });
+
+  elements.installApp.addEventListener("click", async () => {
+    if (!deferredInstallPrompt) {
+      return;
+    }
+
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    elements.installApp.hidden = true;
+  });
+
+  window.addEventListener("appinstalled", () => {
+    deferredInstallPrompt = null;
+    elements.installApp.hidden = true;
+  });
+}
+
 elements.date.valueAsDate = new Date();
 elements.form.addEventListener("submit", addExpense);
 elements.income.addEventListener("input", updateIncome);
@@ -467,4 +511,6 @@ elements.categoryForm.addEventListener("submit", saveCategory);
 elements.newCategory.addEventListener("click", addCategory);
 elements.deleteCategory.addEventListener("click", deleteCategory);
 elements.yearSelect.addEventListener("change", renderYearlySummary);
+registerServiceWorker();
+setupInstallPrompt();
 render();

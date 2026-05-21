@@ -20,6 +20,7 @@
 body {
   margin: 0;
   min-height: 100vh;
+  min-height: 100dvh;
   font-family:
     Inter, "Segoe UI", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
   color: var(--ink);
@@ -38,7 +39,7 @@ select {
 .app-shell {
   width: min(1280px, calc(100% - 32px));
   margin: 0 auto;
-  padding: 28px 0 40px;
+  padding: calc(28px + env(safe-area-inset-top)) 0 calc(40px + env(safe-area-inset-bottom));
 }
 
 .hero {
@@ -86,6 +87,37 @@ h1 {
   color: var(--muted);
   font-size: 1.08rem;
   line-height: 1.7;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.install-button {
+  min-height: 42px;
+  background: #9be7f2;
+  box-shadow: 0 8px 0 #62bfd0;
+}
+
+.install-button:hover {
+  box-shadow: 0 6px 0 #62bfd0;
+}
+
+.status-chip {
+  display: inline-grid;
+  min-height: 32px;
+  place-items: center;
+  border: 2px solid rgba(47, 53, 66, 0.12);
+  border-radius: 999px;
+  padding: 0 12px;
+  background: rgba(255, 255, 255, 0.68);
+  color: #34745b;
+  font-size: 0.82rem;
+  font-weight: 900;
 }
 
 .mascot-scene {
@@ -318,6 +350,7 @@ label {
 input,
 select {
   width: 100%;
+  font-size: 16px;
   min-height: 44px;
   border: 2px solid var(--line);
   border-radius: 12px;
@@ -746,17 +779,123 @@ input[type="color"] {
 
 @media (max-width: 620px) {
   .app-shell {
-    width: min(100% - 20px, 1180px);
-    padding-top: 10px;
+    width: min(100% - 18px, 1180px);
+    padding-top: calc(10px + env(safe-area-inset-top));
   }
 
   .hero {
-    padding: 22px;
+    min-height: auto;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 20px;
     border-radius: 20px;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 15vw, 3.4rem);
+    line-height: 0.98;
+  }
+
+  .subtitle {
+    font-size: 0.98rem;
+    line-height: 1.55;
+  }
+
+  .hero-actions,
+  .install-button,
+  .status-chip {
+    width: 100%;
+  }
+
+  .hero-actions {
+    align-items: stretch;
+  }
+
+  .mascot-scene {
+    min-height: 172px;
+    order: -1;
+  }
+
+  .mascot {
+    right: 50%;
+    bottom: 4px;
+    width: 128px;
+    height: 142px;
+    border-width: 4px;
+    transform: translateX(50%);
+  }
+
+  .ear {
+    top: -34px;
+    width: 44px;
+    height: 58px;
+    border-width: 4px;
+  }
+
+  .belly {
+    width: 58px;
+    height: 44px;
+    font-size: 1.5rem;
+  }
+
+  .blob-one {
+    right: 50%;
+    bottom: 4px;
+    width: 190px;
+    height: 130px;
+    transform: translateX(50%);
+  }
+
+  .blob-two {
+    right: calc(50% - 90px);
+    top: 10px;
+    width: 112px;
+    height: 112px;
+  }
+
+  .coin {
+    width: 34px;
+    height: 34px;
+    border-width: 3px;
+  }
+
+  .coin-one {
+    right: calc(50% + 76px);
+    top: 32px;
+  }
+
+  .coin-two {
+    right: calc(50% - 112px);
+    top: 42px;
+  }
+
+  .coin-three {
+    right: calc(50% + 72px);
+    bottom: 28px;
   }
 
   .summary-grid {
     grid-template-columns: 1fr;
+  }
+
+  .summary-card,
+  .panel,
+  .category-row,
+  .expense-row,
+  .month-card {
+    border-radius: 16px;
+  }
+
+  .panel {
+    padding: 14px;
+  }
+
+  .panel-title {
+    align-items: flex-start;
+  }
+
+  .panel-title h2 {
+    font-size: 1.08rem;
   }
 
   .form-grid,
