@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>家庭支出 Monitor & Planner</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Family Budget Lab</p>
+          <h1>家庭支出 Monitor & Planner</h1>
+          <p class="subtitle">把每一笔支出放进可爱的收纳盒里，月底也能清清楚楚。</p>
+        </div>
+        <div class="mascot-scene" aria-hidden="true">
+          <div class="blob blob-one"></div>
+          <div class="blob blob-two"></div>
+          <div class="mascot">
+            <div class="ear ear-left"></div>
+            <div class="ear ear-right"></div>
+            <div class="face">
+              <span class="eye eye-left"></span>
+              <span class="eye eye-right"></span>
+              <span class="mouth"></span>
+            </div>
+            <div class="belly">¥</div>
+          </div>
+          <div class="coin coin-one">+</div>
+          <div class="coin coin-two">¥</div>
+          <div class="coin coin-three">%</div>
+        </div>
+      </section>
+
+      <section class="summary-grid" aria-label="预算概览">
+        <article class="summary-card">
+          <span>本月收入</span>
+          <strong id="incomeTotal">¥0</strong>
+        </article>
+        <article class="summary-card">
+          <span>已花费</span>
+          <strong id="spentTotal">¥0</strong>
+        </article>
+        <article class="summary-card">
+          <span>剩余预算</span>
+          <strong id="remainingTotal">¥0</strong>
+        </article>
+        <article class="summary-card accent">
+          <span>储蓄率</span>
+          <strong id="savingRate">0%</strong>
+        </article>
+      </section>
+
+      <section class="workspace">
+        <aside class="panel input-panel">
+          <div class="panel-title">
+            <h2>记录一笔</h2>
+            <span class="pill">Local</span>
+          </div>
+          <form id="expenseForm">
+            <label>
+              名称
+              <input id="expenseName" type="text" placeholder="例如：周末超市" required />
+            </label>
+            <label>
+              金额
+              <input id="expenseAmount" type="number" min="0.01" step="0.01" placeholder="128.50" required />
+            </label>
+            <label>
+              分类
+              <select id="expenseCategory" required></select>
+            </label>
+            <label>
+              日期
+              <input id="expenseDate" type="date" required />
+            </label>
+            <button type="submit">添加支出</button>
+          </form>
+
+          <div class="income-box">
+            <label>
+              本月家庭收入
+              <input id="incomeInput" type="number" min="0" step="100" />
+            </label>
+          </div>
+        </aside>
+
+        <section class="panel budget-panel">
+          <div class="panel-title">
+            <h2>分类预算</h2>
+            <button id="resetData" class="ghost-button" type="button">重置</button>
+          </div>
+          <div id="categoryList" class="category-list"></div>
+        </section>
+
+        <section class="panel timeline-panel">
+          <div class="panel-title">
+            <h2>最近支出</h2>
+            <span id="expenseCount" class="pill">0 笔</span>
+          </div>
+          <div id="expenseList" class="expense-list"></div>
+        </section>
+      </section>
+    </main>
+
+    <template id="categoryTemplate">
+      <article class="category-row">
+        <div class="category-topline">
+          <span class="category-icon"></span>
+          <div>
+            <h3></h3>
+            <p></p>
+          </div>
+          <strong></strong>
+        </div>
+        <div class="progress-track">
+          <span></span>
+        </div>
+      </article>
+    </template>
+
+    <template id="expenseTemplate">
+      <article class="expense-row">
+        <span class="expense-dot"></span>
+        <div>
+          <h3></h3>
+          <p></p>
+        </div>
+        <strong></strong>
+      </article>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>
