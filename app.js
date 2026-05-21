@@ -39,7 +39,7 @@ const preciseCurrency = new Intl.NumberFormat("zh-CN", {
 const monthNames = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
 const storageKey = "family-budget-planner-state";
 const panelLayoutKey = "family-budget-planner-panel-layout";
-const defaultPanelOrder = ["input", "budget", "timeline", "category", "yearly"];
+const defaultPanelOrder = ["input", "budget", "timeline", "yearly"];
 
 const elements = {
   panelBoard: document.querySelector("#panelBoard"),
@@ -59,6 +59,9 @@ const elements = {
   expenseList: document.querySelector("#expenseList"),
   expenseCount: document.querySelector("#expenseCount"),
   reset: document.querySelector("#resetData"),
+  openCategoryEditor: document.querySelector("#openCategoryEditor"),
+  categoryDialog: document.querySelector("#categoryDialog"),
+  closeCategoryEditor: document.querySelector("#closeCategoryEditor"),
   resetDialog: document.querySelector("#resetDialog"),
   confirmReset: document.querySelector("#confirmReset"),
   cancelReset: document.querySelector("#cancelReset"),
@@ -620,6 +623,19 @@ function deleteCategory() {
   render();
 }
 
+function openCategoryDialog() {
+  syncCategoryEditor();
+  if (typeof elements.categoryDialog.showModal === "function") {
+    elements.categoryDialog.showModal();
+  }
+}
+
+function closeCategoryDialog() {
+  if (elements.categoryDialog.open) {
+    elements.categoryDialog.close();
+  }
+}
+
 function resetRecords() {
   if (typeof elements.resetDialog.showModal === "function") {
     elements.resetDialog.showModal();
@@ -684,6 +700,13 @@ elements.date.valueAsDate = new Date();
 elements.form.addEventListener("submit", addExpense);
 elements.income.addEventListener("input", updateIncome);
 elements.reset.addEventListener("click", resetRecords);
+elements.openCategoryEditor.addEventListener("click", openCategoryDialog);
+elements.closeCategoryEditor.addEventListener("click", closeCategoryDialog);
+elements.categoryDialog.addEventListener("click", (event) => {
+  if (event.target === elements.categoryDialog) {
+    closeCategoryDialog();
+  }
+});
 elements.confirmReset.addEventListener("click", clearRecords);
 elements.cancelReset.addEventListener("click", () => elements.resetDialog.close());
 elements.resetDialog.addEventListener("click", (event) => {

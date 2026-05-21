@@ -318,12 +318,8 @@ label,
   grid-column: span 4;
 }
 
-.category-editor-panel {
-  grid-column: span 4;
-}
-
 .yearly-panel {
-  grid-column: span 8;
+  grid-column: span 12;
 }
 
 .panel {
@@ -336,6 +332,13 @@ label,
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 16px;
+}
+
+.panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 .drag-handle {
@@ -813,6 +816,41 @@ input[type="color"] {
   font-size: 1.28rem;
 }
 
+.category-dialog {
+  width: min(520px, calc(100vw - 28px));
+  padding: 20px;
+  text-align: left;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.dialog-tools {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.close-button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  border-radius: 999px;
+  padding: 0;
+  background: #fff3f5;
+  color: #bf4d63;
+  box-shadow: none;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
 .cute-dialog p {
   max-width: 320px;
   margin: 10px auto 20px;
@@ -867,7 +905,6 @@ input[type="color"] {
   .input-panel,
   .budget-panel,
   .timeline-panel,
-  .category-editor-panel,
   .yearly-panel {
     grid-column: 1;
   }
@@ -967,6 +1004,17 @@ input[type="color"] {
     align-items: flex-start;
   }
 
+  .panel-actions {
+    flex-wrap: nowrap;
+  }
+
+  .panel-actions .ghost-button {
+    min-height: 34px;
+    padding-inline: 10px;
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+
   .panel-title h2 {
     font-size: 1.08rem;
   }
@@ -1011,6 +1059,10 @@ input[type="color"] {
 
   .cute-dialog {
     padding-inline: 18px;
+  }
+
+  .category-dialog {
+    padding: 16px;
   }
 
   .dialog-actions {

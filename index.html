@@ -103,7 +103,10 @@
         <section class="panel budget-panel" data-panel="budget">
           <div class="panel-title">
             <h2>分类预算</h2>
-            <button id="resetData" class="ghost-button danger" type="button">重置记录</button>
+            <div class="panel-actions">
+              <button id="openCategoryEditor" class="ghost-button" type="button">修改分类</button>
+              <button id="resetData" class="ghost-button danger" type="button">重置记录</button>
+            </div>
           </div>
           <div id="categoryList" class="category-list"></div>
         </section>
@@ -115,41 +118,6 @@
           </div>
           <div id="expenseList" class="expense-list"></div>
         </section>
-        <section class="panel category-editor-panel" data-panel="category">
-          <div class="panel-title">
-            <h2>修改分类</h2>
-            <button id="newCategory" class="icon-text-button" type="button">+ 新增</button>
-          </div>
-          <form id="categoryForm" class="category-form">
-            <label>
-              选择分类
-              <select id="categorySelect"></select>
-            </label>
-            <div class="form-grid">
-              <label>
-                名称
-                <input id="categoryName" type="text" maxlength="12" required />
-              </label>
-              <label>
-                图标字
-                <input id="categoryIcon" type="text" maxlength="2" required />
-              </label>
-              <label>
-                月预算
-                <input id="categoryBudget" type="number" min="0" step="100" required />
-              </label>
-              <label>
-                颜色
-                <input id="categoryColor" type="color" />
-              </label>
-            </div>
-            <div class="button-row">
-              <button type="submit">保存分类</button>
-              <button id="deleteCategory" class="ghost-button danger" type="button">删除</button>
-            </div>
-          </form>
-        </section>
-
         <section class="panel yearly-panel" data-panel="yearly">
           <div class="panel-title">
             <h2>年度总结</h2>
@@ -190,6 +158,44 @@
         <button id="confirmReset" class="danger-button" type="button">清空记录</button>
         <button id="cancelReset" class="soft-button" type="button">再想想</button>
       </div>
+    </dialog>
+
+    <dialog id="categoryDialog" class="cute-dialog category-dialog" aria-labelledby="categoryDialogTitle">
+      <div class="dialog-header">
+        <h2 id="categoryDialogTitle">修改分类</h2>
+        <button id="closeCategoryEditor" class="close-button" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="dialog-tools">
+        <button id="newCategory" class="icon-text-button" type="button">+ 新增</button>
+      </div>
+      <form id="categoryForm" class="category-form">
+        <label>
+          选择分类
+          <select id="categorySelect"></select>
+        </label>
+        <div class="form-grid">
+          <label>
+            名称
+            <input id="categoryName" type="text" maxlength="12" required />
+          </label>
+          <label>
+            图标字
+            <input id="categoryIcon" type="text" maxlength="2" required />
+          </label>
+          <label>
+            月预算
+            <input id="categoryBudget" type="number" min="0" step="100" required />
+          </label>
+          <label>
+            颜色
+            <input id="categoryColor" type="color" />
+          </label>
+        </div>
+        <div class="button-row">
+          <button type="submit">保存分类</button>
+          <button id="deleteCategory" class="ghost-button danger" type="button">删除</button>
+        </div>
+      </form>
     </dialog>
 
     <template id="categoryTemplate">
