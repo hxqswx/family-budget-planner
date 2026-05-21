@@ -60,6 +60,8 @@ const elements = {
   form: document.querySelector("#expenseForm"),
   installApp: document.querySelector("#installApp"),
   installDialog: document.querySelector("#installDialog"),
+  installDialogTitle: document.querySelector("#installDialogTitle"),
+  installSteps: document.querySelector("#installSteps"),
   closeInstallDialog: document.querySelector("#closeInstallDialog"),
   confirmInstallTip: document.querySelector("#confirmInstallTip"),
   offlineBadge: document.querySelector("#offlineBadge"),
@@ -769,7 +771,9 @@ function registerServiceWorker() {
 function setupInstallPrompt() {
   const isStandalone =
     window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
-  const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+  const userAgent = window.navigator.userAgent;
+  const isIOS = /iphone|ipad|ipod/i.test(userAgent);
+  const isAndroid = /android/i.test(userAgent);
 
   elements.installApp.hidden = isStandalone;
 
@@ -781,12 +785,12 @@ function setupInstallPrompt() {
 
   elements.installApp.addEventListener("click", async () => {
     if (isIOS) {
-      elements.installDialog.showModal();
+      showInstallHelp("ios");
       return;
     }
 
     if (!deferredInstallPrompt) {
-      elements.installDialog.showModal();
+      showInstallHelp(isAndroid ? "android" : "desktop");
       return;
     }
 
@@ -808,6 +812,33 @@ function setupInstallPrompt() {
     deferredInstallPrompt = null;
     elements.installApp.hidden = true;
   });
+}
+
+function showInstallHelp(platform) {
+  const copy = {
+    ios: {
+      title: "安装到 iPhone",
+      steps: ["用 Safari 打开这个页面。", "点底部分享按钮。", "选择“添加到主屏幕”。"],
+    },
+    android: {
+      title: "安装到安卓手机",
+      steps: ["用 Chrome 打开这个页面。", "点右上角菜单按钮。", "选择“安装应用”或“添加到主屏幕”。"],
+    },
+    desktop: {
+      title: "安装到设备",
+      steps: ["用 Chrome 或 Edge 打开这个页面。", "点地址栏右侧的安装图标。", "选择“安装”。"],
+    },
+  }[platform];
+
+  elements.installDialogTitle.textContent = copy.title;
+  elements.installSteps.replaceChildren(
+    ...copy.steps.map((step) => {
+      const item = document.createElement("li");
+      item.textContent = step;
+      return item;
+    }),
+  );
+  elements.installDialog.showModal();
 }
 
 elements.date.valueAsDate = new Date();

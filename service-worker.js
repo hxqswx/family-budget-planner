@@ -1,4 +1,4 @@
-const CACHE_NAME = "family-budget-planner-v9";
+const CACHE_NAME = "family-budget-planner-v10";
 const APP_SHELL = [
   "/",
   "/index.html",
