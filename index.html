@@ -12,7 +12,7 @@
         <div class="hero-copy">
           <p class="eyebrow">Family Budget Lab</p>
           <h1>家庭支出 Monitor & Planner</h1>
-          <p class="subtitle">把每一笔支出放进可爱的收纳盒里，月底也能清清楚楚。</p>
+          <p class="subtitle">把每一笔支出放进可爱的收纳盒里，年底也能看清每个月的变化。</p>
         </div>
         <div class="mascot-scene" aria-hidden="true">
           <div class="blob blob-one"></div>
@@ -89,7 +89,7 @@
         <section class="panel budget-panel">
           <div class="panel-title">
             <h2>分类预算</h2>
-            <button id="resetData" class="ghost-button" type="button">重置</button>
+            <button id="resetData" class="ghost-button danger" type="button">重置记录</button>
           </div>
           <div id="categoryList" class="category-list"></div>
         </section>
@@ -100,6 +100,68 @@
             <span id="expenseCount" class="pill">0 笔</span>
           </div>
           <div id="expenseList" class="expense-list"></div>
+        </section>
+      </section>
+
+      <section class="lower-grid">
+        <section class="panel category-editor-panel">
+          <div class="panel-title">
+            <h2>修改分类</h2>
+            <button id="newCategory" class="ghost-button" type="button">新增分类</button>
+          </div>
+          <form id="categoryForm" class="category-form">
+            <label>
+              选择分类
+              <select id="categorySelect"></select>
+            </label>
+            <div class="form-grid">
+              <label>
+                名称
+                <input id="categoryName" type="text" maxlength="12" required />
+              </label>
+              <label>
+                图标字
+                <input id="categoryIcon" type="text" maxlength="2" required />
+              </label>
+              <label>
+                月预算
+                <input id="categoryBudget" type="number" min="0" step="100" required />
+              </label>
+              <label>
+                颜色
+                <input id="categoryColor" type="color" />
+              </label>
+            </div>
+            <div class="button-row">
+              <button type="submit">保存分类</button>
+              <button id="deleteCategory" class="ghost-button danger" type="button">删除分类</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel yearly-panel">
+          <div class="panel-title">
+            <h2>年度总结</h2>
+            <label class="compact-label">
+              年份
+              <select id="yearSelect"></select>
+            </label>
+          </div>
+          <div class="year-stats">
+            <article>
+              <span>年度支出</span>
+              <strong id="yearTotal">¥0</strong>
+            </article>
+            <article>
+              <span>月均支出</span>
+              <strong id="monthAverage">¥0</strong>
+            </article>
+            <article>
+              <span>最高月份</span>
+              <strong id="topMonth">-</strong>
+            </article>
+          </div>
+          <div id="monthBreakdown" class="month-grid"></div>
         </section>
       </section>
     </main>
@@ -128,6 +190,16 @@
           <p></p>
         </div>
         <strong></strong>
+      </article>
+    </template>
+
+    <template id="monthTemplate">
+      <article class="month-card">
+        <div class="month-head">
+          <h3></h3>
+          <strong></strong>
+        </div>
+        <div class="month-bars"></div>
       </article>
     </template>
 
