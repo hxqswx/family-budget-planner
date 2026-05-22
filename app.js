@@ -826,7 +826,11 @@ function isRunningInstalled() {
 
 function getInstallPlatform() {
   const userAgent = window.navigator.userAgent;
+  const isIPadOS = /macintosh/i.test(userAgent) && window.navigator.maxTouchPoints > 1;
   if (/iphone|ipad|ipod/i.test(userAgent)) {
+    return "ios";
+  }
+  if (isIPadOS) {
     return "ios";
   }
   if (/android/i.test(userAgent)) {
